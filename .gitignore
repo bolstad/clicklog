@@ -1,0 +1,5 @@
+*log
+vendor/
+*.csv
+composer.lock
+*.sh
