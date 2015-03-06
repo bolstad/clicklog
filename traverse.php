@@ -12,8 +12,10 @@ class clickLog {
 
   private $parser;
   private $lastEntry;
+  private $lastRaw;
   private $datafile;
   private $lines;
+  private $found;
 
   function __construct( $file = '' ) {
 
@@ -29,8 +31,14 @@ class clickLog {
 
 
   function processLastEntry() {
+    $single = $this->lastEntry;
+    if ( !isset( $single['request'] ) ) {
+      return;
+    }
+    if ( strpos( $single['request']['path'], 'gclid' ) !== false ) {
+      $this->found[] = array('parsed'=>$this->lastEntry, 'raw' => $this->lastRaw);
+    }
 
-    //    print_r( $this->lastEntry );
   }
 
   /**
@@ -52,15 +60,28 @@ class clickLog {
     return $lines;
   }
 
+  function report() {
+    print_r($this->found());
+  }
   function run() {
 
     $lines = $this->getLines( $this->datafile );
     echo "$lines of lines in this file\n";
+
+    $count = 0;
+
+    $progressBar = new \ProgressBar\Manager( 0, $lines );
+    $progressBar->update( $count );
+
     foreach ( new LogIterator( $this->datafile, $this->parser ) as $line => $data ) {
+      $count++;
 
       try {
         $this->lastEntry = $this->parser->parseLine( $line );
+        $this->lastRaw = $line;
         $this->processLastEntry();
+        if ( $count % 1000 == 0 )
+          $progressBar->update( $count );
 
       }
       catch( MVar\Apache2LogParser\Exception\NoMatchesException $noMatch ) {
@@ -83,5 +104,5 @@ PHP_Timer::start();
 
 $clickLog = new clickLog( $file );
 $clickLog->run();
-
+$clickLog->report();
 print PHP_Timer::resourceUsage();

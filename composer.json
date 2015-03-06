@@ -1,6 +1,7 @@
 {
     "require": {
         "phpunit/php-timer": "~1.0",
-        "mvar/apache2-log-parser": "1.0.0"
+        "mvar/apache2-log-parser": "1.0.0",
+	"guiguiboy/php-cli-progress-bar": "dev-master"
     }
 }
