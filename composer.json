@@ -1,6 +1,5 @@
 {
     "require": {
-        "kassner/log-parser": "~1.0",
-        "mvar/apache2-log-parser": "dev-master"
+        "mvar/apache2-log-parser": "1.0.0"
     }
 }
