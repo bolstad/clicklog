@@ -13,6 +13,7 @@ class clickLog {
   private $parser;
   private $lastEntry;
   private $datafile;
+  private $lines;
 
   function __construct( $file = '' ) {
 
@@ -29,10 +30,32 @@ class clickLog {
 
   function processLastEntry() {
 
-    print_r( $this->lastEntry );
+    //    print_r( $this->lastEntry );
+  }
+
+  /**
+   * Count number of lines in a textfile, props 'jack' at Stackoverflow: http://stackoverflow.com/a/20537130/1792591
+   *
+   * @param string  $file
+   * @return int
+   */
+  function getLines( $file ) {
+    $f = fopen( $file, 'rb' );
+    $lines = 0;
+
+    while ( !feof( $f ) ) {
+      $lines += substr_count( fread( $f, 8192 ), "\n" );
+    }
+
+    fclose( $f );
+
+    return $lines;
   }
 
   function run() {
+
+    $lines = $this->getLines( $this->datafile );
+    echo "$lines of lines in this file\n";
     foreach ( new LogIterator( $this->datafile, $this->parser ) as $line => $data ) {
 
       try {
@@ -56,5 +79,9 @@ if ( empty( $argv[1] ) ) {
 
 $file = $argv[1];
 
+PHP_Timer::start();
+
 $clickLog = new clickLog( $file );
 $clickLog->run();
+
+print PHP_Timer::resourceUsage();
